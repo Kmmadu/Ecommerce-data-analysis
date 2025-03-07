@@ -34,7 +34,7 @@ The dataset includes information on major e-commerce companies, such as:
 To set up the project locally, follow these steps:
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ecommerce-data-analysis.git
+   git clone https://github.com/Kmmadu/ecommerce-data-analysis.git
    cd ecommerce-data-analysis
    ```
 2. Create a virtual environment and activate it:
