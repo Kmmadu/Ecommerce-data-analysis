@@ -31,4 +31,3 @@ df = pd.DataFrame(rows, columns=headers)
 # Save to CSV
 df.to_csv(r'C:\Users\Kmmadu\ecommerce-data-analysis\data\internet_companies.csv', index=False)
 
-print("CSV file saved successfully!")
