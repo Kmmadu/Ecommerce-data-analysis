@@ -29,5 +29,5 @@ for row in table.find_all('tr')[1:]:  # Skip header row
 df = pd.DataFrame(rows, columns=headers)
 
 # Save to CSV
-df.to_csv(r'C:\Users\Kmmadu\ecommerce-data-analysis\data\internet_companies.csv', index=False)
+df.to_csv(r'C:\Users\Kmmadu\ecommerce-data-analysis\data\raw_internet_companies.csv', index=False)
 
