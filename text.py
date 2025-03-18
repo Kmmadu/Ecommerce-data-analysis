@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load dataset
-def load_data():
-    df = pd.read_csv("data/internet_companies.csv")
-    return df
+df = pd.read_csv("data/internet_companies.csv")
 
-df = load_data()
+# Convert numeric columns to float
+df["Revenue USD billions"] = pd.to_numeric(df["Revenue USD billions"], errors="coerce")
+df["Market cap. USD billions"] = pd.to_numeric(df["Market cap. USD billions"], errors="coerce")
+df["Employees"] = pd.to_numeric(df["Employees"], errors="coerce")
+
 
 # Sidebar Filters
 st.sidebar.header("Filters")
@@ -21,32 +23,52 @@ if selected_industry != "All":
 if selected_company != "All":
     df = df[df["Company"] == selected_company]
 
-# Overview Metrics
-st.title("📊 Internet Companies EDA Dashboard")
+# Title
+st.title("Internet Companies Dashboard")
+
+# Overview
+st.header("Overview")
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Companies", len(df))
-col2.metric("Avg. Revenue (USD B)", round(df["Revenue USD billions"].mean(), 2))
-col3.metric("Avg. Market Cap (USD B)", round(df["Market cap. USD billions"].mean(), 2))
+col2.metric("Total Revenue (USD billions)", df["Revenue USD billions"].sum())
+col3.metric("Total Market Cap (USD billions)", df["Market cap. USD billions"].sum())
 
-# Industry Distribution
+# Industry Analysis
+st.header("Industry Analysis")
+industry_counts = df["Industry"].value_counts()
 st.subheader("Number of Companies by Industry")
-plt.figure(figsize=(10, 5))
-sns.countplot(y=df["Industry"], order=df["Industry"].value_counts().index, palette="viridis")
-st.pyplot(plt)
+st.bar_chart(industry_counts)
 
-# Top 10 Companies by Revenue
-st.subheader("Top 10 Companies by Revenue")
+industry_revenue = df.groupby("Industry")["Revenue USD billions"].sum()
+st.subheader("Total Revenue by Industry")
+st.bar_chart(industry_revenue)
+
+# Geographical Analysis
+st.header("Geographical Analysis")
+location_counts = df["Headquarters"].value_counts().head(10)
+st.subheader("Top 10 Locations by Number of Companies")
+st.bar_chart(location_counts)
+
+# Top Performers
+st.header("Top Performers")
 top_revenue = df.nlargest(10, "Revenue USD billions")
-plt.figure(figsize=(10, 5))
-sns.barplot(x="Revenue USD billions", y="Company", data=top_revenue, palette="coolwarm")
-st.pyplot(plt)
+st.subheader("Top 10 Companies by Revenue")
+st.write(top_revenue[["Company", "Revenue USD billions"]])
 
-# Revenue vs Market Cap
-st.subheader("Revenue vs. Market Cap")
-plt.figure(figsize=(8, 5))
-sns.scatterplot(x=df["Revenue USD billions"], y=df["Market cap. USD billions"], hue=df["Industry"], palette="Set1")
-st.pyplot(plt)
+# Revenue and Market Cap Trends
+st.header("Revenue and Market Cap Trends")
+fig, ax = plt.subplots()
+sns.scatterplot(x="Revenue USD billions", y="Market cap. USD billions", data=df, ax=ax)
+st.pyplot(fig)
 
-# Interactive Data Table
-st.subheader("Company Data Table")
-st.dataframe(df)
+# Employee Analysis
+st.header("Employee Analysis")
+df["Revenue per Employee"] = df["Revenue USD billions"] * 1e9 / df["Employees"]
+top_revenue_per_employee = df.nlargest(10, "Revenue per Employee")
+st.subheader("Top 10 Companies by Revenue per Employee")
+st.write(top_revenue_per_employee[["Company", "Revenue per Employee"]])
+
+# Display Filtered Data
+st.sidebar.header("Filtered Data")
+st.write(f"Data for {selected_industry} Industry and {selected_company} Company")
+st.write(df)
